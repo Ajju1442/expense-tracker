@@ -1,61 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Expense Tracker Pro</title>
 
+https://cdn.jsdelivr.net/npm/chart.js
+
 <style>
+
+*{
+    box-sizing:border-box;
+}
 
 body{
     font-family:Arial,sans-serif;
     background:#f4f4f4;
     margin:0;
     padding:20px;
+    transition:0.3s;
 }
 
 .container{
-    max-width:1000px;
+    max-width:1200px;
     margin:auto;
 }
 
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
 .card{
-    background:#fff;
+    background:white;
     padding:15px;
     border-radius:10px;
     margin-bottom:15px;
     box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
-input,select{
+input,
+select{
     width:100%;
     padding:10px;
     margin-top:8px;
     margin-bottom:10px;
     border:1px solid #ccc;
     border-radius:5px;
-    box-sizing:border-box;
 }
 
 button{
-    padding:8px 12px;
     border:none;
+    padding:10px 15px;
     border-radius:5px;
     cursor:pointer;
     color:white;
-    margin-right:5px;
 }
 
 .add-btn{
     background:#0078D7;
 }
 
+.status-btn{
+    background:#28a745;
+}
+
 .delete-btn{
     background:#d9534f;
 }
 
-.status-btn{
-    background:#28a745;
+.theme-btn{
+    background:#444;
+}
+
+.summary{
+    display:flex;
+    gap:15px;
+}
+
+.summary div{
+    flex:1;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.filter-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.filter-row select{
+    max-width:250px;
 }
 
 table{
@@ -84,28 +125,65 @@ th{
     font-weight:bold;
 }
 
-.summary{
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
+/* DARK MODE */
+
+.dark-mode{
+    background:#121212;
+    color:white;
 }
 
-.summary div{
-    flex:1;
-    background:white;
-    padding:15px;
-    border-radius:10px;
-    text-align:center;
+.dark-mode .card,
+.dark-mode .summary div{
+    background:#1e1e1e;
+    color:white;
 }
 
-.filter-row{
-    display:flex;
-    gap:10px;
-    align-items:center;
+.dark-mode input,
+.dark-mode select{
+    background:#2d2d2d;
+    color:white;
+    border:1px solid #555;
 }
 
-.filter-row select{
-    width:250px;
+.dark-mode table{
+    color:white;
+}
+
+.dark-mode td{
+    border-color:#444;
+}
+
+.dark-mode th{
+    background:#005fb8;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .header{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .summary{
+        flex-direction:column;
+    }
+
+    .filter-row{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+    button{
+        margin-top:5px;
+    }
 }
 
 </style>
@@ -115,12 +193,19 @@ th{
 
 <div class="container">
 
-<h2>💰 Expense Tracker Pro</h2>
+<div class="header">
+    <h2>💰 Expense Tracker Pro</h2>
 
-<div class="card summary">
+    <button class="theme-btn" onclick="toggleDarkMode()">
+        🌙 Dark Mode
+    </button>
+</div>
+
+<div class="summary">
+
     <div>
         <h3 id="totalExpense">₹0</h3>
-        <small>Total</small>
+        <small>Total Expense</small>
     </div>
 
     <div>
@@ -132,6 +217,7 @@ th{
         <h3 id="pendingAmount">₹0</h3>
         <small>Pending</small>
     </div>
+
 </div>
 
 <div class="card">
@@ -143,11 +229,6 @@ th{
     <input type="number" id="amount" placeholder="Amount">
 
     <input type="date" id="duedate">
-
-    <select id="status">
-        <option>Pending</option>
-        <option>Paid</option>
-    </select>
 
     <input type="number" id="paid" placeholder="Amount Paid">
 
@@ -166,12 +247,22 @@ th{
 
 <div class="card">
 
+    <h3>📊 Monthly Expense Trend</h3>
+
+    <canvas id="expenseChart"></canvas>
+
+</div>
+
+<div class="card">
+
     <div class="filter-row">
+
         <h3>Expenses</h3>
 
         <select id="monthFilter" onchange="renderTable()">
             <option value="">All Months</option>
         </select>
+
     </div>
 
     <table>
@@ -185,7 +276,7 @@ th{
                 <th>Due Date</th>
                 <th>Status</th>
                 <th>Recurring</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
         </thead>
 
@@ -202,14 +293,35 @@ th{
 let expenses =
 JSON.parse(localStorage.getItem("expenses")) || [];
 
-carryForwardRecurring();
+let expenseChart = null;
+
+/* DARK MODE */
+
+function toggleDarkMode(){
+
+    document.body.classList.toggle("dark-mode");
+
+    localStorage.setItem(
+        "darkMode",
+        document.body.classList.contains("dark-mode")
+    );
+}
+
+if(localStorage.getItem("darkMode")==="true"){
+    document.body.classList.add("dark-mode");
+}
+
+/* STORAGE */
 
 function saveData(){
+
     localStorage.setItem(
         "expenses",
         JSON.stringify(expenses)
     );
 }
+
+/* ADD EXPENSE */
 
 function addExpense(){
 
@@ -222,10 +334,16 @@ function addExpense(){
     let dueDate =
     document.getElementById("duedate").value;
 
+    if(!document.getElementById("name").value ||
+       !amount){
+        alert("Please enter Expense Name and Amount");
+        return;
+    }
+
     let month =
-    dueDate ?
-    dueDate.substring(0,7) :
-    new Date().toISOString().substring(0,7);
+    dueDate
+    ? dueDate.substring(0,7)
+    : new Date().toISOString().substring(0,7);
 
     let expense = {
 
@@ -252,13 +370,17 @@ function addExpense(){
     saveData();
 
     populateMonthFilter();
-
     renderTable();
+    renderChart();
 
     document.getElementById("name").value="";
     document.getElementById("amount").value="";
     document.getElementById("paid").value="";
+    document.getElementById("duedate").value="";
+    document.getElementById("recurring").checked=false;
 }
+
+/* DELETE */
 
 function deleteExpense(index){
 
@@ -267,7 +389,10 @@ function deleteExpense(index){
     saveData();
 
     renderTable();
+    renderChart();
 }
+
+/* STATUS TOGGLE */
 
 function toggleStatus(index){
 
@@ -286,14 +411,15 @@ function toggleStatus(index){
     saveData();
 
     renderTable();
+    renderChart();
 }
+
+/* MONTHLY RECURRING */
 
 function carryForwardRecurring(){
 
-    const now = new Date();
-
     const currentMonth =
-    now.toISOString().substring(0,7);
+    new Date().toISOString().substring(0,7);
 
     const lastMonth =
     localStorage.getItem("lastCarryForward");
@@ -302,10 +428,10 @@ function carryForwardRecurring(){
         return;
     }
 
-    let recurringItems =
+    let recurringExpenses =
     expenses.filter(e => e.recurring);
 
-    recurringItems.forEach(item => {
+    recurringExpenses.forEach(item => {
 
         let exists =
         expenses.some(exp =>
@@ -336,22 +462,25 @@ function carryForwardRecurring(){
     saveData();
 }
 
+/* FILTER */
+
 function populateMonthFilter(){
 
+    const filter =
+    document.getElementById("monthFilter");
+
+    let selected =
+    filter.value;
+
     let months =
-    [...new Set(expenses.map(e => e.month))]
+    [...new Set(expenses.map(e=>e.month))]
     .sort()
     .reverse();
 
-    let filter =
-    document.getElementById("monthFilter");
-
-    let currentValue = filter.value;
-
-    filter.innerHTML=
+    filter.innerHTML =
     '<option value="">All Months</option>';
 
-    months.forEach(month=>{
+    months.forEach(month => {
 
         filter.innerHTML +=
         `<option value="${month}">
@@ -359,26 +488,28 @@ function populateMonthFilter(){
         </option>`;
     });
 
-    filter.value=currentValue;
+    filter.value = selected;
 }
+
+/* TABLE */
 
 function renderTable(){
 
-    let table =
+    const table =
     document.getElementById("expenseTable");
 
-    table.innerHTML="";
-
-    let filterMonth =
+    const selectedMonth =
     document.getElementById("monthFilter").value;
+
+    table.innerHTML="";
 
     let total=0;
     let paidTotal=0;
 
     expenses.forEach((e,index)=>{
 
-        if(filterMonth &&
-           e.month !== filterMonth){
+        if(selectedMonth &&
+           e.month !== selectedMonth){
             return;
         }
 
@@ -386,6 +517,7 @@ function renderTable(){
         paidTotal += e.paid;
 
         table.innerHTML += `
+
         <tr>
 
             <td>${e.name}</td>
@@ -398,14 +530,8 @@ function renderTable(){
 
             <td>${e.dueDate || "-"}</td>
 
-            <td class="${
-                e.status==="Paid"
-                ?"paid"
-                :"pending"
-            }">
-
+            <td class="${e.status==="Paid" ? "paid" : "pending"}">
                 ${e.status}
-
             </td>
 
             <td>
@@ -417,21 +543,15 @@ function renderTable(){
                 <button
                 class="status-btn"
                 onclick="toggleStatus(${index})">
-
-                ${
-                    e.status==="Pending"
-                    ?"Mark Paid"
-                    :"Mark Pending"
-                }
-
+                ${e.status==="Pending"
+                ? "Mark Paid"
+                : "Mark Pending"}
                 </button>
 
                 <button
                 class="delete-btn"
                 onclick="deleteExpense(${index})">
-
                 Delete
-
                 </button>
 
             </td>
@@ -440,24 +560,72 @@ function renderTable(){
         `;
     });
 
-    document.getElementById(
-        "totalExpense"
-    ).innerText=
-    "₹"+total;
+    document.getElementById("totalExpense")
+    .innerText = "₹" + total;
 
-    document.getElementById(
-        "paidAmount"
-    ).innerText=
-    "₹"+paidTotal;
+    document.getElementById("paidAmount")
+    .innerText = "₹" + paidTotal;
 
-    document.getElementById(
-        "pendingAmount"
-    ).innerText=
-    "₹"+(total-paidTotal);
+    document.getElementById("pendingAmount")
+    .innerText = "₹" + (total-paidTotal);
 }
 
+/* CHART */
+
+function renderChart(){
+
+    let monthlyData = {};
+
+    expenses.forEach(exp => {
+
+        if(!monthlyData[exp.month]){
+            monthlyData[exp.month]=0;
+        }
+
+        monthlyData[exp.month]+=exp.amount;
+    });
+
+    let labels =
+    Object.keys(monthlyData).sort();
+
+    let values =
+    labels.map(label =>
+        monthlyData[label]);
+
+    let ctx =
+    document.getElementById("expenseChart");
+
+    if(expenseChart){
+        expenseChart.destroy();
+    }
+
+    expenseChart = new Chart(ctx, {
+
+        type:"bar",
+
+        data:{
+            labels:labels,
+
+            datasets:[{
+                label:"Monthly Expenses",
+                data:values,
+                backgroundColor:"#0078D7"
+            }]
+        },
+
+        options:{
+            responsive:true,
+            maintainAspectRatio:true
+        }
+    });
+}
+
+/* INIT */
+
+carryForwardRecurring();
 populateMonthFilter();
 renderTable();
+renderChart();
 
 </script>
 
