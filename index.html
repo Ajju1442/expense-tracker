@@ -2,98 +2,112 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Expense Manager Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker Pro</title>
 
 <style>
+
 body{
-font-family:Arial,sans-serif;
-background:#f5f5f5;
-margin:0;
-padding:20px;
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
 }
 
 .container{
-max-width:1000px;
-margin:auto;
+    max-width:1000px;
+    margin:auto;
 }
 
 .card{
-background:white;
-padding:15px;
-margin-bottom:15px;
-border-radius:10px;
-box-shadow:0 2px 5px rgba(0,0,0,.1);
-}
-
-h1{
-text-align:center;
-color:#0078D7;
+    background:#fff;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
 input,select{
-width:100%;
-padding:10px;
-margin-top:5px;
-margin-bottom:10px;
-border:1px solid #ccc;
-border-radius:5px;
-box-sizing:border-box;
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    margin-bottom:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    box-sizing:border-box;
 }
 
 button{
-background:#0078D7;
-color:white;
-border:none;
-padding:10px 15px;
-border-radius:5px;
-cursor:pointer;
-margin-right:5px;
+    padding:8px 12px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    color:white;
+    margin-right:5px;
 }
 
-button:hover{
-background:#005fa3;
+.add-btn{
+    background:#0078D7;
 }
 
-.summary{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
+.delete-btn{
+    background:#d9534f;
 }
 
-.summary div{
-flex:1;
-background:#0078D7;
-color:white;
-padding:15px;
-border-radius:10px;
-text-align:center;
+.status-btn{
+    background:#28a745;
 }
 
 table{
-width:100%;
-border-collapse:collapse;
+    width:100%;
+    border-collapse:collapse;
 }
 
 th,td{
-border:1px solid #ddd;
-padding:8px;
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:left;
 }
 
 th{
-background:#0078D7;
-color:white;
+    background:#0078D7;
+    color:white;
 }
 
 .paid{
-color:green;
-font-weight:bold;
+    color:green;
+    font-weight:bold;
 }
 
 .pending{
-color:red;
-font-weight:bold;
+    color:red;
+    font-weight:bold;
 }
+
+.summary{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.summary div{
+    flex:1;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.filter-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.filter-row select{
+    width:250px;
+}
+
 </style>
 </head>
 
@@ -101,82 +115,83 @@ font-weight:bold;
 
 <div class="container">
 
-<h1>💰 Expense Manager Pro</h1>
+<h2>💰 Expense Tracker Pro</h2>
 
-<div class="summary">
+<div class="card summary">
+    <div>
+        <h3 id="totalExpense">₹0</h3>
+        <small>Total</small>
+    </div>
 
-<div>
-<h2 id="totalExpense">₹0</h2>
-<p>Total</p>
+    <div>
+        <h3 id="paidAmount">₹0</h3>
+        <small>Paid</small>
+    </div>
+
+    <div>
+        <h3 id="pendingAmount">₹0</h3>
+        <small>Pending</small>
+    </div>
 </div>
 
-<div>
-<h2 id="paidExpense">₹0</h2>
-<p>Paid</p>
-</div>
+<div class="card">
 
-<div>
-<h2 id="pendingExpense">₹0</h2>
-<p>Pending</p>
-</div>
+    <h3>Add Expense</h3>
+
+    <input type="text" id="name" placeholder="Expense Name">
+
+    <input type="number" id="amount" placeholder="Amount">
+
+    <input type="date" id="duedate">
+
+    <select id="status">
+        <option>Pending</option>
+        <option>Paid</option>
+    </select>
+
+    <input type="number" id="paid" placeholder="Amount Paid">
+
+    <label>
+        <input type="checkbox" id="recurring">
+        Monthly Recurring Expense
+    </label>
+
+    <br><br>
+
+    <button class="add-btn" onclick="addExpense()">
+        Add Expense
+    </button>
 
 </div>
 
 <div class="card">
 
-<h3>Add Expense</h3>
+    <div class="filter-row">
+        <h3>Expenses</h3>
 
-<input id="name" placeholder="Expense Name">
+        <select id="monthFilter" onchange="renderTable()">
+            <option value="">All Months</option>
+        </select>
+    </div>
 
-<input id="amount" type="number" placeholder="Amount">
+    <table>
 
-<input id="duedate" type="date">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Paid</th>
+                <th>Month</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Recurring</th>
+                <th>Action</th>
+            </tr>
+        </thead>
 
-<select id="status">
-<option value="Pending">Pending</option>
-<option value="Paid">Paid</option>
-</select>
+        <tbody id="expenseTable"></tbody>
 
-<input id="paid" type="number" placeholder="Amount Paid">
-
-<label>
-<input type="checkbox" id="recurring">
- Monthly Recurring Expense
-</label>
-
-<br><br>
-
-<button onclick="addExpense()">
-Save Expense
-</button>
-
-<button onclick="generateNextMonth()">
-Generate Next Month
-</button>
-
-</div>
-
-<div class="card">
-
-<h3>Expenses</h3>
-
-<table>
-
-<thead>
-<tr>
-<th>Name</th>
-<th>Amount</th>
-<th>Paid</th>
-<th>Status</th>
-<th>Month</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody id="expenseTable">
-</tbody>
-
-</table>
+    </table>
 
 </div>
 
@@ -187,233 +202,262 @@ Generate Next Month
 let expenses =
 JSON.parse(localStorage.getItem("expenses")) || [];
 
-function saveExpenses(){
+carryForwardRecurring();
 
-localStorage.setItem(
-"expenses",
-JSON.stringify(expenses)
-);
-
+function saveData(){
+    localStorage.setItem(
+        "expenses",
+        JSON.stringify(expenses)
+    );
 }
 
 function addExpense(){
 
-let name =
-document.getElementById("name").value.trim();
+    let amount =
+    Number(document.getElementById("amount").value);
 
-let amount =
-parseFloat(
-document.getElementById("amount").value
-);
+    let paid =
+    Number(document.getElementById("paid").value);
 
-if(!name){
-alert("Enter expense name");
-return;
-}
+    let dueDate =
+    document.getElementById("duedate").value;
 
-if(isNaN(amount)){
-alert("Enter amount");
-return;
-}
+    let month =
+    dueDate ?
+    dueDate.substring(0,7) :
+    new Date().toISOString().substring(0,7);
 
-let expense = {
+    let expense = {
 
-name:name,
+        name:
+        document.getElementById("name").value,
 
-amount:amount,
+        amount:amount,
 
-paid:parseFloat(
-document.getElementById("paid").value
-) || 0,
+        paid:paid,
 
-status:
-document.getElementById("status").value,
+        dueDate:dueDate,
 
-month:
-new Date().getMonth()+1,
+        month:month,
 
-year:
-new Date().getFullYear(),
+        status:
+        paid >= amount ? "Paid" : "Pending",
 
-recurring:
-document.getElementById("recurring").checked
+        recurring:
+        document.getElementById("recurring").checked
+    };
 
-};
+    expenses.push(expense);
 
-expenses.push(expense);
+    saveData();
 
-saveExpenses();
+    populateMonthFilter();
 
-renderExpenses();
+    renderTable();
 
-document.getElementById("name").value="";
-document.getElementById("amount").value="";
-document.getElementById("paid").value="";
-
-}
-
-function toggleStatus(index){
-
-if(expenses[index].status==="Pending"){
-
-expenses[index].status="Paid";
-expenses[index].paid=
-expenses[index].amount;
-
-}else{
-
-expenses[index].status="Pending";
-expenses[index].paid=0;
-
-}
-
-saveExpenses();
-renderExpenses();
-
+    document.getElementById("name").value="";
+    document.getElementById("amount").value="";
+    document.getElementById("paid").value="";
 }
 
 function deleteExpense(index){
 
-expenses.splice(index,1);
+    expenses.splice(index,1);
 
-saveExpenses();
-renderExpenses();
+    saveData();
 
+    renderTable();
 }
 
-function generateNextMonth(){
+function toggleStatus(index){
 
-let currentMonth =
-new Date().getMonth()+1;
+    if(expenses[index].status==="Pending"){
 
-let nextMonth =
-currentMonth+1;
+        expenses[index].status="Paid";
+        expenses[index].paid=
+        expenses[index].amount;
 
-let year =
-new Date().getFullYear();
+    }else{
 
-if(nextMonth>12){
-nextMonth=1;
-year++;
+        expenses[index].status="Pending";
+        expenses[index].paid=0;
+    }
+
+    saveData();
+
+    renderTable();
 }
 
-expenses.forEach(exp=>{
+function carryForwardRecurring(){
 
-if(exp.recurring){
+    const now = new Date();
 
-let exists =
-expenses.some(x=>
+    const currentMonth =
+    now.toISOString().substring(0,7);
 
-x.name===exp.name &&
-x.month===nextMonth &&
-x.year===year
+    const lastMonth =
+    localStorage.getItem("lastCarryForward");
 
-);
+    if(lastMonth === currentMonth){
+        return;
+    }
 
-if(!exists){
+    let recurringItems =
+    expenses.filter(e => e.recurring);
 
-expenses.push({
+    recurringItems.forEach(item => {
 
-name:exp.name,
-amount:exp.amount,
-paid:0,
-status:"Pending",
-month:nextMonth,
-year:year,
-recurring:true
+        let exists =
+        expenses.some(exp =>
+            exp.name === item.name &&
+            exp.month === currentMonth
+        );
 
-});
+        if(!exists){
 
+            expenses.push({
+
+                name:item.name,
+                amount:item.amount,
+                paid:0,
+                dueDate:"",
+                month:currentMonth,
+                status:"Pending",
+                recurring:true
+            });
+        }
+    });
+
+    localStorage.setItem(
+        "lastCarryForward",
+        currentMonth
+    );
+
+    saveData();
 }
 
+function populateMonthFilter(){
+
+    let months =
+    [...new Set(expenses.map(e => e.month))]
+    .sort()
+    .reverse();
+
+    let filter =
+    document.getElementById("monthFilter");
+
+    let currentValue = filter.value;
+
+    filter.innerHTML=
+    '<option value="">All Months</option>';
+
+    months.forEach(month=>{
+
+        filter.innerHTML +=
+        `<option value="${month}">
+            ${month}
+        </option>`;
+    });
+
+    filter.value=currentValue;
 }
 
-});
+function renderTable(){
 
-saveExpenses();
-renderExpenses();
+    let table =
+    document.getElementById("expenseTable");
 
-alert("Next Month Generated");
+    table.innerHTML="";
 
+    let filterMonth =
+    document.getElementById("monthFilter").value;
+
+    let total=0;
+    let paidTotal=0;
+
+    expenses.forEach((e,index)=>{
+
+        if(filterMonth &&
+           e.month !== filterMonth){
+            return;
+        }
+
+        total += e.amount;
+        paidTotal += e.paid;
+
+        table.innerHTML += `
+        <tr>
+
+            <td>${e.name}</td>
+
+            <td>₹${e.amount}</td>
+
+            <td>₹${e.paid}</td>
+
+            <td>${e.month}</td>
+
+            <td>${e.dueDate || "-"}</td>
+
+            <td class="${
+                e.status==="Paid"
+                ?"paid"
+                :"pending"
+            }">
+
+                ${e.status}
+
+            </td>
+
+            <td>
+                ${e.recurring ? "✅" : "❌"}
+            </td>
+
+            <td>
+
+                <button
+                class="status-btn"
+                onclick="toggleStatus(${index})">
+
+                ${
+                    e.status==="Pending"
+                    ?"Mark Paid"
+                    :"Mark Pending"
+                }
+
+                </button>
+
+                <button
+                class="delete-btn"
+                onclick="deleteExpense(${index})">
+
+                Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+        `;
+    });
+
+    document.getElementById(
+        "totalExpense"
+    ).innerText=
+    "₹"+total;
+
+    document.getElementById(
+        "paidAmount"
+    ).innerText=
+    "₹"+paidTotal;
+
+    document.getElementById(
+        "pendingAmount"
+    ).innerText=
+    "₹"+(total-paidTotal);
 }
 
-function renderExpenses(){
-
-let tbody =
-document.getElementById("expenseTable");
-
-tbody.innerHTML="";
-
-let total=0;
-let paid=0;
-
-expenses.forEach((exp,index)=>{
-
-total += Number(exp.amount);
-paid += Number(exp.paid);
-
-tbody.innerHTML += `
-
-<tr>
-
-<td>${exp.name}</td>
-
-<td>₹${exp.amount}</td>
-
-<td>₹${exp.paid}</td>
-
-<td class="${
-exp.status==="Paid"
-? "paid"
-: "pending"
-}">
-${exp.status}
-</td>
-
-<td>
-${exp.month}/${exp.year}
-</td>
-
-<td>
-
-<button
-onclick="toggleStatus(${index})">
-
-Toggle
-
-</button>
-
-<button
-onclick="deleteExpense(${index})">
-
-Delete
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-document.getElementById(
-"totalExpense"
-).innerText="₹"+total;
-
-document.getElementById(
-"paidExpense"
-).innerText="₹"+paid;
-
-document.getElementById(
-"pendingExpense"
-).innerText=
-"₹"+(total-paid);
-
-}
-
-renderExpenses();
+populateMonthFilter();
+renderTable();
 
 </script>
 
