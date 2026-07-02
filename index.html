@@ -6,162 +6,174 @@
 <title>Expense Manager Pro</title>
 
 <style>
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
+}
+
 body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f9;
-    margin:0;
-    padding:20px;
+background:#f5f7fb;
+padding:20px;
 }
 
 .container{
-    max-width:1100px;
-    margin:auto;
+max-width:1200px;
+margin:auto;
 }
 
 h1{
-    text-align:center;
-    color:#0078d7;
+text-align:center;
+margin-bottom:20px;
+color:#0078d7;
+}
+
+.cards{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:20px;
 }
 
 .card{
-    background:#fff;
-    padding:20px;
-    margin-bottom:15px;
-    border-radius:12px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
 .summary{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
+flex:1;
+min-width:200px;
+text-align:center;
+background:#0078d7;
+color:white;
 }
 
-.summary .box{
-    flex:1;
-    min-width:180px;
-    background:#0078d7;
-    color:white;
-    padding:15px;
-    border-radius:10px;
-    text-align:center;
+.form-card{
+margin-bottom:20px;
 }
 
 input,select{
-    width:100%;
-    padding:10px;
-    margin-top:8px;
-    margin-bottom:10px;
-    border:1px solid #ccc;
-    border-radius:6px;
-    box-sizing:border-box;
+width:100%;
+padding:10px;
+margin-top:8px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:6px;
 }
 
 button{
-    border:none;
-    background:#0078d7;
-    color:white;
-    padding:10px 15px;
-    border-radius:6px;
-    cursor:pointer;
-    margin-right:5px;
-    margin-top:5px;
+background:#0078d7;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+margin:3px;
 }
 
 button:hover{
-    background:#005fa3;
+background:#005da8;
 }
 
 table{
-    width:100%;
-    border-collapse:collapse;
+width:100%;
+border-collapse:collapse;
 }
 
 th,td{
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:left;
+padding:10px;
+border:1px solid #ddd;
+text-align:left;
 }
 
 th{
-    background:#0078d7;
-    color:white;
+background:#0078d7;
+color:white;
 }
 
 .paid{
-    color:green;
-    font-weight:bold;
+color:green;
+font-weight:bold;
 }
 
 .pending{
-    color:red;
-    font-weight:bold;
-}
-
-.filters{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+color:red;
+font-weight:bold;
 }
 
 @media(max-width:768px){
-    table{
-        font-size:12px;
-    }
+
+table{
+font-size:12px;
+}
+
+.cards{
+flex-direction:column;
+}
 }
 </style>
 </head>
-
 <body>
 
 <div class="container">
 
 <h1>💰 Expense Manager Pro</h1>
 
-<div class="summary">
+<div class="cards">
 
-<div class="box">
+<div class="card summary">
 <h2 id="totalExpense">₹0</h2>
 <p>Total Expense</p>
 </div>
 
-<div class="box">
+<div class="card summary">
 <h2 id="paidAmount">₹0</h2>
 <p>Total Paid</p>
 </div>
 
-<div class="box">
+<div class="card summary">
 <h2 id="pendingAmount">₹0</h2>
 <p>Pending</p>
 </div>
 
 </div>
 
-<div class="card">
+<div class="card form-card">
 
-<h2>Add Expense Template</h2>
+<h2>Add Expense</h2>
 
-<input type="text" id="name" placeholder="Expense Name (WiFi, Rent, SIP etc)">
+<input type="text" id="name"
+placeholder="Expense Name">
 
-<input type="number" id="amount" placeholder="Amount">
+<input type="number" id="amount"
+placeholder="Amount">
 
 <input type="date" id="duedate">
 
 <select id="status">
-<option>Pending</option>
-<option>Paid</option>
+<option value="Pending">Pending</option>
+<option value="Paid">Paid</option>
 </select>
 
-<input type="number" id="paid" placeholder="Amount Paid">
+<input type="number" id="paid"
+placeholder="Amount Paid">
 
 <label>
-<input type="checkbox" id="recurring" checked>
-Monthly Recurring Expense
+<input type="checkbox"
+id="recurring"
+checked
+style="width:auto;">
+ Monthly Recurring
 </label>
 
 <br><br>
 
-<button onclick="addExpense()">Save Expense</button>
+<button onclick="addExpense()">
+Save Expense
+</button>
 
 <button onclick="createNextMonth()">
 Generate Next Month
@@ -171,11 +183,10 @@ Generate Next Month
 
 <div class="card">
 
-<h2>Filter</h2>
+<h3>Filter Month</h3>
 
-<div class="filters">
-
-<select id="monthFilter" onchange="renderTable()">
+<select id="monthFilter"
+onchange="renderTable()">
 
 <option value="all">All Months</option>
 
@@ -196,8 +207,6 @@ Generate Next Month
 
 </div>
 
-</div>
-
 <div class="card">
 
 <h2>Expenses</h2>
@@ -214,12 +223,14 @@ Generate Next Month
 <th>Month</th>
 <th>Status</th>
 <th>Recurring</th>
-<th>Action</th>
+<th>Actions</th>
 </tr>
 
 </thead>
 
-<tbody id="expenseTable"></tbody>
+<tbody id="expenseTable">
+
+</tbody>
 
 </table>
 
@@ -230,41 +241,69 @@ Generate Next Month
 <script>
 
 let expenses =
-JSON.parse(localStorage.getItem('expenses')) || [];
+JSON.parse(
+localStorage.getItem("expenses")
+) || [];
 
 function saveData(){
+
 localStorage.setItem(
-'expenses',
+"expenses",
 JSON.stringify(expenses)
 );
+
 }
 
 function addExpense(){
 
-let expense={
+let name =
+document.getElementById("name")
+.value.trim();
 
-name:document.getElementById('name').value,
+let amount =
+Number(
+document.getElementById("amount")
+.value
+);
 
-amount:Number(
-document.getElementById('amount').value
-),
+if(name===""){
+alert("Enter expense name");
+return;
+}
+
+if(amount<=0){
+alert("Enter valid amount");
+return;
+}
+
+let expense = {
+
+name:name,
+
+amount:amount,
 
 paid:Number(
-document.getElementById('paid').value || 0
+document.getElementById("paid")
+.value || 0
 ),
 
 dueDate:
-document.getElementById('duedate').value,
+document.getElementById("duedate")
+.value,
 
 status:
-document.getElementById('status').value,
+document.getElementById("status")
+.value,
 
-month:new Date().getMonth()+1,
+month:
+new Date().getMonth()+1,
 
-year:new Date().getFullYear(),
+year:
+new Date().getFullYear(),
 
 recurring:
-document.getElementById('recurring').checked
+document.getElementById("recurring")
+.checked
 
 };
 
@@ -274,21 +313,12 @@ saveData();
 
 renderTable();
 
-document.getElementById('name').value='';
-document.getElementById('amount').value='';
-document.getElementById('paid').value='';
-}
+document.getElementById("name").value="";
+document.getElementById("amount").value="";
+document.getElementById("paid").value="";
 
-function deleteExpense(index){
+alert("Expense Saved");
 
-if(confirm("Delete this expense?")){
-
-expenses.splice(index,1);
-
-saveData();
-renderTable();
-
-}
 }
 
 function toggleStatus(index){
@@ -296,3 +326,193 @@ function toggleStatus(index){
 if(expenses[index].status==="Pending"){
 
 expenses[index].status="Paid";
+
+expenses[index].paid=
+expenses[index].amount;
+
+}else{
+
+expenses[index].status="Pending";
+
+expenses[index].paid=0;
+
+}
+
+saveData();
+
+renderTable();
+
+}
+
+function deleteExpense(index){
+
+if(confirm("Delete Expense?")){
+
+expenses.splice(index,1);
+
+saveData();
+
+renderTable();
+
+}
+
+}
+
+function createNextMonth(){
+
+const currentMonth =
+new Date().getMonth()+1;
+
+let nextMonth=currentMonth+1;
+let year=new Date().getFullYear();
+
+if(nextMonth>12){
+nextMonth=1;
+year++;
+}
+
+const recurring =
+expenses.filter(
+e=>e.recurring===true
+);
+
+recurring.forEach(e=>{
+
+const exists =
+expenses.some(x=>
+
+x.name===e.name &&
+x.month===nextMonth &&
+x.year===year
+
+);
+
+if(!exists){
+
+expenses.push({
+
+name:e.name,
+amount:e.amount,
+paid:0,
+dueDate:e.dueDate,
+status:"Pending",
+month:nextMonth,
+year:year,
+recurring:true
+
+});
+
+}
+
+});
+
+saveData();
+
+renderTable();
+
+alert("Next month expenses created");
+
+}
+
+function renderTable(){
+
+let table =
+document.getElementById(
+"expenseTable"
+);
+
+table.innerHTML="";
+
+let total=0;
+let paidTotal=0;
+
+let monthFilter =
+document.getElementById(
+"monthFilter"
+)?.value || "all";
+
+expenses.forEach((e,index)=>{
+
+if(
+monthFilter!=="all" &&
+Number(monthFilter)!==e.month
+){
+return;
+}
+
+total += e.amount;
+paidTotal += e.paid;
+
+table.innerHTML += `
+
+<tr>
+
+<td>${e.name}</td>
+
+<td>₹${e.amount}</td>
+
+<td>₹${e.paid}</td>
+
+<td>${e.dueDate}</td>
+
+<td>${e.month}/${e.year}</td>
+
+<td class="${
+e.status==="Paid"
+? "paid"
+: "pending"
+}">
+${e.status}
+</td>
+
+<td>
+${e.recurring ? "✅" : "❌"}
+</td>
+
+<td>
+
+<button
+onclick="toggleStatus(${index})">
+
+${e.status==="Pending"
+? "Mark Paid"
+: "Mark Pending"}
+
+</button>
+
+<button
+onclick="deleteExpense(${index})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById(
+"totalExpense"
+).innerText="₹"+total;
+
+document.getElementById(
+"paidAmount"
+).innerText="₹"+paidTotal;
+
+document.getElementById(
+"pendingAmount"
+).innerText=
+"₹"+(total-paidTotal);
+
+}
+
+renderTable();
+
+</script>
+
+</body>
+</html>
