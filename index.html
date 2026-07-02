@@ -1,81 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Expense Manager Pro</title>
 
 <style>
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:Arial,sans-serif;
-}
-
 body{
-background:#f5f7fb;
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+margin:0;
 padding:20px;
 }
 
 .container{
-max-width:1200px;
+max-width:1000px;
 margin:auto;
-}
-
-h1{
-text-align:center;
-margin-bottom:20px;
-color:#0078d7;
-}
-
-.cards{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:20px;
 }
 
 .card{
 background:white;
-padding:20px;
-border-radius:12px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
+padding:15px;
+margin-bottom:15px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
 }
 
-.summary{
-flex:1;
-min-width:200px;
+h1{
 text-align:center;
-background:#0078d7;
-color:white;
-}
-
-.form-card{
-margin-bottom:20px;
+color:#0078D7;
 }
 
 input,select{
 width:100%;
 padding:10px;
-margin-top:8px;
-margin-bottom:15px;
+margin-top:5px;
+margin-bottom:10px;
 border:1px solid #ccc;
-border-radius:6px;
+border-radius:5px;
+box-sizing:border-box;
 }
 
 button{
-background:#0078d7;
+background:#0078D7;
 color:white;
 border:none;
 padding:10px 15px;
-border-radius:6px;
+border-radius:5px;
 cursor:pointer;
-margin:3px;
+margin-right:5px;
 }
 
 button:hover{
-background:#005da8;
+background:#005fa3;
+}
+
+.summary{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.summary div{
+flex:1;
+background:#0078D7;
+color:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
 }
 
 table{
@@ -84,13 +76,12 @@ border-collapse:collapse;
 }
 
 th,td{
-padding:10px;
 border:1px solid #ddd;
-text-align:left;
+padding:8px;
 }
 
 th{
-background:#0078d7;
+background:#0078D7;
 color:white;
 }
 
@@ -103,70 +94,54 @@ font-weight:bold;
 color:red;
 font-weight:bold;
 }
-
-@media(max-width:768px){
-
-table{
-font-size:12px;
-}
-
-.cards{
-flex-direction:column;
-}
-}
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
 <h1>💰 Expense Manager Pro</h1>
 
-<div class="cards">
+<div class="summary">
 
-<div class="card summary">
+<div>
 <h2 id="totalExpense">₹0</h2>
-<p>Total Expense</p>
+<p>Total</p>
 </div>
 
-<div class="card summary">
-<h2 id="paidAmount">₹0</h2>
-<p>Total Paid</p>
+<div>
+<h2 id="paidExpense">₹0</h2>
+<p>Paid</p>
 </div>
 
-<div class="card summary">
-<h2 id="pendingAmount">₹0</h2>
+<div>
+<h2 id="pendingExpense">₹0</h2>
 <p>Pending</p>
 </div>
 
 </div>
 
-<div class="card form-card">
+<div class="card">
 
-<h2>Add Expense</h2>
+<h3>Add Expense</h3>
 
-<input type="text" id="name"
-placeholder="Expense Name">
+<input id="name" placeholder="Expense Name">
 
-<input type="number" id="amount"
-placeholder="Amount">
+<input id="amount" type="number" placeholder="Amount">
 
-<input type="date" id="duedate">
+<input id="duedate" type="date">
 
 <select id="status">
 <option value="Pending">Pending</option>
 <option value="Paid">Paid</option>
 </select>
 
-<input type="number" id="paid"
-placeholder="Amount Paid">
+<input id="paid" type="number" placeholder="Amount Paid">
 
 <label>
-<input type="checkbox"
-id="recurring"
-checked
-style="width:auto;">
- Monthly Recurring
+<input type="checkbox" id="recurring">
+ Monthly Recurring Expense
 </label>
 
 <br><br>
@@ -175,7 +150,7 @@ style="width:auto;">
 Save Expense
 </button>
 
-<button onclick="createNextMonth()">
+<button onclick="generateNextMonth()">
 Generate Next Month
 </button>
 
@@ -183,53 +158,22 @@ Generate Next Month
 
 <div class="card">
 
-<h3>Filter Month</h3>
-
-<select id="monthFilter"
-onchange="renderTable()">
-
-<option value="all">All Months</option>
-
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-
-</select>
-
-</div>
-
-<div class="card">
-
-<h2>Expenses</h2>
+<h3>Expenses</h3>
 
 <table>
 
 <thead>
-
 <tr>
 <th>Name</th>
 <th>Amount</th>
 <th>Paid</th>
-<th>Due Date</th>
-<th>Month</th>
 <th>Status</th>
-<th>Recurring</th>
-<th>Actions</th>
+<th>Month</th>
+<th>Action</th>
 </tr>
-
 </thead>
 
 <tbody id="expenseTable">
-
 </tbody>
 
 </table>
@@ -241,11 +185,9 @@ onchange="renderTable()">
 <script>
 
 let expenses =
-JSON.parse(
-localStorage.getItem("expenses")
-) || [];
+JSON.parse(localStorage.getItem("expenses")) || [];
 
-function saveData(){
+function saveExpenses(){
 
 localStorage.setItem(
 "expenses",
@@ -257,22 +199,20 @@ JSON.stringify(expenses)
 function addExpense(){
 
 let name =
-document.getElementById("name")
-.value.trim();
+document.getElementById("name").value.trim();
 
 let amount =
-Number(
-document.getElementById("amount")
-.value
+parseFloat(
+document.getElementById("amount").value
 );
 
-if(name===""){
+if(!name){
 alert("Enter expense name");
 return;
 }
 
-if(amount<=0){
-alert("Enter valid amount");
+if(isNaN(amount)){
+alert("Enter amount");
 return;
 }
 
@@ -282,18 +222,12 @@ name:name,
 
 amount:amount,
 
-paid:Number(
-document.getElementById("paid")
-.value || 0
-),
-
-dueDate:
-document.getElementById("duedate")
-.value,
+paid:parseFloat(
+document.getElementById("paid").value
+) || 0,
 
 status:
-document.getElementById("status")
-.value,
+document.getElementById("status").value,
 
 month:
 new Date().getMonth()+1,
@@ -302,22 +236,19 @@ year:
 new Date().getFullYear(),
 
 recurring:
-document.getElementById("recurring")
-.checked
+document.getElementById("recurring").checked
 
 };
 
 expenses.push(expense);
 
-saveData();
+saveExpenses();
 
-renderTable();
+renderExpenses();
 
 document.getElementById("name").value="";
 document.getElementById("amount").value="";
 document.getElementById("paid").value="";
-
-alert("Expense Saved");
 
 }
 
@@ -326,62 +257,54 @@ function toggleStatus(index){
 if(expenses[index].status==="Pending"){
 
 expenses[index].status="Paid";
-
 expenses[index].paid=
 expenses[index].amount;
 
 }else{
 
 expenses[index].status="Pending";
-
 expenses[index].paid=0;
 
 }
 
-saveData();
-
-renderTable();
+saveExpenses();
+renderExpenses();
 
 }
 
 function deleteExpense(index){
 
-if(confirm("Delete Expense?")){
-
 expenses.splice(index,1);
 
-saveData();
-
-renderTable();
-
-}
+saveExpenses();
+renderExpenses();
 
 }
 
-function createNextMonth(){
+function generateNextMonth(){
 
-const currentMonth =
+let currentMonth =
 new Date().getMonth()+1;
 
-let nextMonth=currentMonth+1;
-let year=new Date().getFullYear();
+let nextMonth =
+currentMonth+1;
+
+let year =
+new Date().getFullYear();
 
 if(nextMonth>12){
 nextMonth=1;
 year++;
 }
 
-const recurring =
-expenses.filter(
-e=>e.recurring===true
-);
+expenses.forEach(exp=>{
 
-recurring.forEach(e=>{
+if(exp.recurring){
 
-const exists =
+let exists =
 expenses.some(x=>
 
-x.name===e.name &&
+x.name===exp.name &&
 x.month===nextMonth &&
 x.year===year
 
@@ -391,10 +314,9 @@ if(!exists){
 
 expenses.push({
 
-name:e.name,
-amount:e.amount,
+name:exp.name,
+amount:exp.amount,
 paid:0,
-dueDate:e.dueDate,
 status:"Pending",
 month:nextMonth,
 year:year,
@@ -404,69 +326,52 @@ recurring:true
 
 }
 
+}
+
 });
 
-saveData();
+saveExpenses();
+renderExpenses();
 
-renderTable();
-
-alert("Next month expenses created");
+alert("Next Month Generated");
 
 }
 
-function renderTable(){
+function renderExpenses(){
 
-let table =
-document.getElementById(
-"expenseTable"
-);
+let tbody =
+document.getElementById("expenseTable");
 
-table.innerHTML="";
+tbody.innerHTML="";
 
 let total=0;
-let paidTotal=0;
+let paid=0;
 
-let monthFilter =
-document.getElementById(
-"monthFilter"
-)?.value || "all";
+expenses.forEach((exp,index)=>{
 
-expenses.forEach((e,index)=>{
+total += Number(exp.amount);
+paid += Number(exp.paid);
 
-if(
-monthFilter!=="all" &&
-Number(monthFilter)!==e.month
-){
-return;
-}
-
-total += e.amount;
-paidTotal += e.paid;
-
-table.innerHTML += `
+tbody.innerHTML += `
 
 <tr>
 
-<td>${e.name}</td>
+<td>${exp.name}</td>
 
-<td>₹${e.amount}</td>
+<td>₹${exp.amount}</td>
 
-<td>₹${e.paid}</td>
-
-<td>${e.dueDate}</td>
-
-<td>${e.month}/${e.year}</td>
+<td>₹${exp.paid}</td>
 
 <td class="${
-e.status==="Paid"
+exp.status==="Paid"
 ? "paid"
 : "pending"
 }">
-${e.status}
+${exp.status}
 </td>
 
 <td>
-${e.recurring ? "✅" : "❌"}
+${exp.month}/${exp.year}
 </td>
 
 <td>
@@ -474,9 +379,7 @@ ${e.recurring ? "✅" : "❌"}
 <button
 onclick="toggleStatus(${index})">
 
-${e.status==="Pending"
-? "Mark Paid"
-: "Mark Pending"}
+Toggle
 
 </button>
 
@@ -500,17 +403,17 @@ document.getElementById(
 ).innerText="₹"+total;
 
 document.getElementById(
-"paidAmount"
-).innerText="₹"+paidTotal;
+"paidExpense"
+).innerText="₹"+paid;
 
 document.getElementById(
-"pendingAmount"
+"pendingExpense"
 ).innerText=
-"₹"+(total-paidTotal);
+"₹"+(total-paid);
 
 }
 
-renderTable();
+renderExpenses();
 
 </script>
 
